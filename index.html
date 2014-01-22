@@ -27,9 +27,22 @@
         #gravatar {
             padding-left: 10px;
         }
+        #nav a strong {
+            padding-left: 5px;
+        }
      </style>
      <script type="text/javascript">
         function getParameterByName(e){e=e.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");var t=new RegExp("[\\?&]"+e+"=([^&#]*)"),n=t.exec(location.search);return n==null?"":decodeURIComponent(n[1].replace(/\+/g," "))}
+
+        function getSubdomain(){return window.location.host.split('.')[0]}
+
+        function determineName() {
+            var paramName = getParameterByName("name");
+            if (paramName === undefined) {
+                paramName = getSubdomain();
+            }
+            return paramName;
+        }
 
         function updateTable(language, repo_data) {
             var name,stars,forks,watchers,size,created,updated,repo,desc_div,link;
@@ -63,7 +76,7 @@
             $("#repo_table tbody tr").remove();
         }
         $("body").ready(function () {
-            var name = getParameterByName("name");
+            var name = determineName();
             $.getJSON("https://api.github.com/users/"+ name, function(data){
                 window.document.title = "(" + name + ") " + data.name;
                 $("#user_name").prepend($('<a>').attr("href",data.blog).text(data.name));
@@ -97,16 +110,16 @@
                 };
                 for (k in repo_data) {
                     $("#nav").append($('<a>').attr("href","#").
-                        addClass("list-group-item").addClass("nav_lang").text(k).click(function() {
+                        addClass("list-group-item").addClass("nav_lang").append($("<span>").text(k).addClass("nav_lang_name")).click(function() {
                             $("#nav a").removeClass("active");
                             $(this).addClass("active");
-                            var lang = $(this).text();
+                            var lang = $(this).find(".nav_lang_name").text();
                             clearTable();
                             updateTable(lang, repo_data);
-                        }));
+                        }).append($('<strong>').text(repo_data[k].length)));
                 }
 
-                updateTable($("#nav a:first").text(), repo_data);
+                updateTable($("#nav a:first .nav_lang_name").text(), repo_data);
                 $("#nav a:first").addClass("active");
                 
                 $("#repo_table").tablesorter();
