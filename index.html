@@ -71,6 +71,10 @@
                     $("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated);
                     $('#repo_table tbody').append($("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated));
                 }
+            //$("#repo_table").tablesorter();
+            $("#repo_table").trigger("update"); 
+            var sorting = [[0,0]]; 
+            $("#repo_table").trigger("sorton",[sorting]);
         }
         function clearTable() {
             $("#repo_table tbody tr").remove();
@@ -121,8 +125,8 @@
 
                 updateTable($("#nav a:first .nav_lang_name").text(), repo_data);
                 $("#nav a:first").addClass("active");
-                
                 $("#repo_table").tablesorter();
+                
                 $("#starred_count").text(stars);
             });
             $(".nav_lang")
