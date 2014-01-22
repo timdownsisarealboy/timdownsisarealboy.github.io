@@ -58,7 +58,9 @@
                     description = $("<small>").text(repo.description);
 
                     desc_div.append(repo_link);
-                    desc_div.append(description);
+                    if (repo.description !== null) {
+                        desc_div.append(description);
+                    }
 
                     name = $('<td>').append(desc_div);
                     stars_cnt = $('<td>').addClass("number_cell").text(repo.stargazers_count);
