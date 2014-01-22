@@ -38,7 +38,7 @@
 
         function determineName() {
             var paramName = getParameterByName("name");
-            if (paramName === undefined) {
+            if (paramName === "") {
                 paramName = getSubdomain();
             }
             return paramName;
