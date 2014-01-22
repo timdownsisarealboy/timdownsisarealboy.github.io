@@ -16,7 +16,9 @@
         #user_name small {
             font-size: 18px;
         }
-
+        .table_desc {
+            max-width: 350px;
+        }
         .table_desc small {
             font-size: 10px;
             font-style: italic;
@@ -68,10 +70,10 @@
                     watchers = $('<td>').addClass("number_cell").text(repo.watchers);
                     size = $('<td>').addClass("number_cell").text(repo.size);
                     created = $('<td>').text(new Date(repo.created_at).toLocaleString());
-                    updated = $('<td>').text(new Date(repo.updated_at).toLocaleString());
+                    //updated = $('<td>').text(new Date(repo.updated_at).toLocaleString());
 
-                    $("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated);
-                    $('#repo_table tbody').append($("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated));
+                    $('#repo_table tbody').append($("<tr>").append(name).append(stars_cnt)
+                        .append(forks).append(watchers).append(size).append(created));
                 }
             //$("#repo_table").tablesorter();
             $("#repo_table").trigger("update"); 
@@ -165,7 +167,6 @@
                     <th>Forks</th>
                     <th>Watchers</th>
                     <th>Size</th>
-                    <th>Created</th>
                     <th>Updated</th>
                   </tr>
                 </thead>
