@@ -67,8 +67,8 @@
                     forks = $('<td>').addClass("number_cell").text(repo.forks_count);
                     watchers = $('<td>').addClass("number_cell").text(repo.watchers);
                     size = $('<td>').addClass("number_cell").text(repo.size);
-                    created = $('<td>').text(repo.created_at);
-                    updated = $('<td>').text(repo.updated_at);
+                    created = $('<td>').text(new Date(repo.created_at).toLocaleString());
+                    updated = $('<td>').text(new Date(repo.updated_at).toLocaleString());
 
                     $("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated);
                     $('#repo_table tbody').append($("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated));
