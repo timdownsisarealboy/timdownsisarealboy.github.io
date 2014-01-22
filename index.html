@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.13.3/jquery.tablesorter.min.js"></script>
+    <style>
+        .container {
+            padding-top: 10px;
+        }
+        #user_name small {
+            font-size: 18px;
+        }
+
+        .table_desc small {
+            font-size: 10px;
+            font-style: italic;
+        }
+        .number_cell {
+            text-align: center;
+        }
+        #gravatar {
+            padding-left: 10px;
+        }
+     </style>
+     <script type="text/javascript">
+        function getParameterByName(e){e=e.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");var t=new RegExp("[\\?&]"+e+"=([^&#]*)"),n=t.exec(location.search);return n==null?"":decodeURIComponent(n[1].replace(/\+/g," "))}
+
+        function updateTable(language, repo_data) {
+            var name,stars,forks,watchers,size,created,updated,repo,desc_div,link;
+            for (i in repo_data[language]) {
+                    repo = repo_data[language][i];
+                    desc_div = $("<div>").addClass("table_desc");
+                    link = $("<a>").attr("href",repo.html_url).text(repo.name);
+                    if (repo.fork == true) {
+                        link.append("&nbsp;<span class=\"badge\">Fork</span>");
+                    }
+                    repo_link = $("<p>").append(link);
+
+                    description = $("<small>").text(repo.description);
+
+                    desc_div.append(repo_link);
+                    desc_div.append(description);
+
+                    name = $('<td>').append(desc_div);
+                    stars_cnt = $('<td>').addClass("number_cell").text(repo.stargazers_count);
+                    forks = $('<td>').addClass("number_cell").text(repo.forks_count);
+                    watchers = $('<td>').addClass("number_cell").text(repo.watchers);
+                    size = $('<td>').addClass("number_cell").text(repo.size);
+                    created = $('<td>').text(repo.created_at);
+                    updated = $('<td>').text(repo.updated_at);
+
+                    $("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated);
+                    $('#repo_table tbody').append($("<tr>").append(name).append(stars_cnt).append(forks).append(watchers).append(size).append(created).append(updated));
+                }
+        }
+        function clearTable() {
+            $("#repo_table tbody tr").remove();
+        }
+        $("body").ready(function () {
+            var name = getParameterByName("name");
+            $.getJSON("https://api.github.com/users/"+ name, function(data){
+                window.document.title = "(" + name + ") " + data.name;
+                $("#user_name").prepend($('<a>').attr("href",data.blog).text(data.name));
+                if (data.company !== null) {
+                    $("#user_company").text(data.company);
+                }
+                if (data.bio !== null) {
+                    $("#user_bio").text(data.bio);
+                }
+                $("#gravatar").attr("src", data.avatar_url);
+                $("#follower_count").text(data.followers);
+                $("#following_count").text(data.following);
+            });
+            $.getJSON( "https://api.github.com/users/"+ name +"/repos", function( data ) {
+                var i = 0,
+                    repo_data = [],
+                    k,
+                    language,
+                    stars = 0;
+
+                for (i in data) {
+                    language = data[i].language;
+                    if (language === null) {
+                        language = "Unknown";
+                    }
+                    if (repo_data[language] === undefined ) {
+                        repo_data[language] = [];
+                    }
+                    repo_data[language].push(data[i]);
+                    stars = stars + data[i].stargazers_count;
+                };
+                for (k in repo_data) {
+                    $("#nav").append($('<a>').attr("href","#").
+                        addClass("list-group-item").addClass("nav_lang").text(k).click(function() {
+                            $("#nav a").removeClass("active");
+                            $(this).addClass("active");
+                            var lang = $(this).text();
+                            clearTable();
+                            updateTable(lang, repo_data);
+                        }));
+                }
+
+                updateTable($("#nav a:first").text(), repo_data);
+                $("#nav a:first").addClass("active");
+                
+                $("#repo_table").tablesorter();
+                $("#starred_count").text(stars);
+            });
+            $(".nav_lang")
+        });
+     </script>
+</head>
+<body>
+    <div class="container">
+        <div class="row row-offcanvas row-offcanvas-right">
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+          <div class="list-group" id="nav">
+          </div>
+        </div><!--/span-->
+        <div class="col-xs-12 col-sm-9">
+          <p class="pull-right visible-xs">
+            <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+          </p>
+          <div class="jumbotron">
+            <p><small id="user_company"></small>&nbsp;|
+                <small>Followers <strong id="follower_count"></strong></small>
+                <small>Starred <strong id="starred_count"></strong></small>
+                <small>Following <strong id="following_count"></strong></small>
+            </p>
+            <h1 id="user_name"><img src="" id="gravatar"/></h1>
+            <p id="user_bio"></p>
+          </div>
+          <div class="row">
+            <div class="col-xs-12 col-sm-12">
+              <table class="table" id="repo_table">
+                <thead>
+                  <tr>
+                    <th>Repo</th>
+                    <th>Stars</th>
+                    <th>Forks</th>
+                    <th>Watchers</th>
+                    <th>Size</th>
+                    <th>Created</th>
+                    <th>Updated</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div><!--/span-->
+            </div><!--/span-->
+          </div><!--/row-->
+        </div><!--/span-->
+      </div>
+    </div>  
+</body>
+</html>
